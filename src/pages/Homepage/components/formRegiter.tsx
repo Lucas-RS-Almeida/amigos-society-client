@@ -33,11 +33,10 @@ export function FormRegister({ $onSubmit, $inRequesting }: IFormRegisterProps) {
         type="submit"
         className="w-full h-10 flex items-center justify-center gap-2 rounded-md mt-5 transition-all bg-[#cfa321] hover:bg-[#9a7917]"
       >
-        <span className="font-bold">
-          { $inRequesting ? "Adicionando" : "Adicionar" }
-        </span>
-
-        {$inRequesting && <FiLoader className="text-[1.25rem] animate-spin" />}
+        {$inRequesting
+            ? (<FiLoader className="text-[1.25rem] animate-spin" />)
+            : (<span className="font-bold">Adicionar</span>)
+          }
       </button>
     </form>
   );
