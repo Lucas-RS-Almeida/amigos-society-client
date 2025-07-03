@@ -54,7 +54,7 @@ export function Homepage() {
         <img
           src="/images/logo.png"
           alt="Logo Amigos do Society"
-          className="w-full max-w-[120px]"
+          className="w-full max-w-[80px]"
         />
 
         {
