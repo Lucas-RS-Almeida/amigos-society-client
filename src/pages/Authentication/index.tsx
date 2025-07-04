@@ -1,5 +1,9 @@
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { FiLoader } from "react-icons/fi";
+
+import { Context } from "../../contexts/AuthContext";
 
 export function Authentication() {
   const [name, setName] = useState<string>("");
@@ -8,14 +12,28 @@ export function Authentication() {
 
   const [inRequesting, setInRequesting] = useState<boolean>(false);
 
+  const { onLogin } = useContext(Context);
+
+  const navigate = useNavigate();
+
   function handleToggleInputType() {
     setInputType(prevState => prevState === "password" ? "text" : "password");
   }
 
-  function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: FormEvent) {
     event.preventDefault();
 
-    setName("");
+    try {
+      setInRequesting(true);
+
+      await onLogin({ name, password });
+
+      navigate("/matches");
+    } catch (error: any) {
+      toast.error(error?.message);
+    } finally {
+      setInRequesting(false);
+    }
   }
 
   return (
