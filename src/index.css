@@ -27,7 +27,7 @@ input {
   outline: none;
 }
 
-button {
+select, button {
   cursor: pointer;
   outline: none;
 }
