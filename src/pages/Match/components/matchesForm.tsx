@@ -3,9 +3,11 @@ import type { AxiosResponse } from "axios";
 import { FiLoader } from "react-icons/fi";
 
 import { api } from "../../../api";
+import { toast } from "react-toastify";
 
 interface IMFProps {
   $isVisible: boolean;
+  $onSubmit: (homeTeamId: string, awayTeamId: string) => Promise<void>;
   $onClose: () => void;
 }
 
@@ -16,13 +18,14 @@ interface ITeamsProps {
   updatedAt: Date;
 }
 
-export function MatchesForm({ $isVisible, $onClose }: IMFProps) {
+export function MatchesForm({ $isVisible, $onSubmit, $onClose }: IMFProps) {
   const [teams, setTeams] = useState<ITeamsProps[]>([]);
 
   const [teamIdOne, setTeamIdOne] = useState<string>("");
   const [teamIdTwo, setTeamIdTwo] = useState<string>("");
 
   const [loadingTeams, setLoadingTeams] = useState<boolean>(false);
+  const [inRequesting, setInRequesting] = useState<boolean>(false);
 
   const formIsValid = teamIdOne && teamIdTwo;
 
@@ -45,10 +48,23 @@ export function MatchesForm({ $isVisible, $onClose }: IMFProps) {
     loadTeams();
   }, []);
 
-  function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: FormEvent) {
     event.preventDefault();
 
-    console.log({teamIdOne, teamIdTwo});
+    try {
+      setInRequesting(true);
+
+      await $onSubmit(teamIdOne, teamIdTwo);
+
+      setTeamIdOne("");
+      setTeamIdTwo("");
+
+      $onClose();
+    } catch (error: any) {
+      toast.error(error?.message);
+    } finally {
+      setInRequesting(false);
+    }
   }
 
   if (!$isVisible) {
@@ -58,7 +74,7 @@ export function MatchesForm({ $isVisible, $onClose }: IMFProps) {
   return (
     <div
       onClick={$onClose}
-      className="min-w-screen min-h-screen fixed top-0 left-0 flex flex-col gap-4 items-center justify-center bg-[rgba(0,0,0,0.4)]"
+      className="min-w-screen min-h-screen fixed top-0 left-0 flex flex-col gap-4 items-center justify-center bgGradient"
     >
       <form
         onSubmit={handleSubmit} className="w-full max-w-[300px]"
@@ -76,6 +92,7 @@ export function MatchesForm({ $isVisible, $onClose }: IMFProps) {
               ) : (
                 <select
                   onChange={(event) => setTeamIdOne(event.target.value)}
+                  value={teamIdOne}
                   className="w-full h-10 absolute top-0 left-0 rounded-md px-2 border-1 border-none"
                 >
                   <option value="">Selecione o time 1</option>
@@ -107,6 +124,7 @@ export function MatchesForm({ $isVisible, $onClose }: IMFProps) {
               ) : (
                 <select
                   onChange={(event) => setTeamIdTwo(event.target.value)}
+                  value={teamIdTwo}
                   className="w-full h-10 absolute top-0 left-0 rounded-md px-2 border-1 border-none"
                 >
                   <option value="">Selecione o time 2</option>
@@ -133,7 +151,7 @@ export function MatchesForm({ $isVisible, $onClose }: IMFProps) {
           className="w-full h-10 flex items-center justify-center gap-2 rounded-md mt-5 transition-all bg-[#cfa321] hover:bg-[#9a7917] disabled:bg-[#ccc]"
         >
           {
-            loadingTeams
+            inRequesting
               ? (<FiLoader className="text-[1.25rem] animate-spin" />)
               : (<span className="font-bold">Adicionar</span>)
           }
