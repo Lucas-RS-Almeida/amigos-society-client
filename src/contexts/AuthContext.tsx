@@ -64,7 +64,7 @@ export function AuthProvider({ children }: IAPProps) {
         } catch (error: any) {
           toast.error(error?.response?.data?.error);
 
-          navigate("/authentication");
+          navigate("/login");
 
           localStorage.removeItem("@amigos_society_token");
           localStorage.removeItem("@amigos_society_username");
