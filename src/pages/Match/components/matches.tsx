@@ -1,7 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useContext, useEffect } from "react";
 import type { AxiosResponse } from "axios";
 import { toast } from "react-toastify";
 import { TbPlayFootball } from "react-icons/tb";
+
+import { Context } from "../../../contexts/AuthContext";
 
 import { api } from "../../../api";
 
@@ -40,6 +42,8 @@ export function Matches() {
   const [refresh, setRefresh] = useState<boolean>(false);
   const [formIsVisible, setFormIsVisible] = useState<boolean>(false);
 
+  const { isAuthenticated } = useContext(Context);
+
   useEffect(() => {
     async function loadMatches() {
       try {
@@ -74,43 +78,46 @@ export function Matches() {
   return (
     <div>
       <MatchesForm
-        $isVisible={formIsVisible}
+        $isVisible={formIsVisible && isAuthenticated}
         $onSubmit={handleCreateMatch}
         $onClose={() => setFormIsVisible(false)}
       />
 
       {
-        matches.length > 0
-          ? (
-            <ul className="flex flex-col gap-4 mt-6">
-              {
-                matches.map((match) => (
-                  <MatchItem key={match.matches.id} match={match} />
-                ))
-              }
-            </ul>
-          ) : (
-            <div className="flex flex-col items-center justify-center mt-28">
-              <div className="w-full max-w-[300px] flex flex-col items-center gap-5">
-                <div className="w-[80px] h-[80px] flex items-center justify-center rounded-md bg-[#cfa321]">
-                  <TbPlayFootball className="text-5xl" />
-                </div>
-
-                <span className="text-[1.25rem] text-center">Nenhuma partida iniciada. Clique no botão abaixo para iniciar uma nova patida.</span>
-
-                <button
-                  onClick={() => setFormIsVisible(true)}
-                  className="w-full h-10 flex items-center justify-center gap-2 rounded-md transition-all bg-[#cfa321] hover:bg-[#9a7917]"
-                >
-                  <span className="font-bold">Iniciar</span>
-                </button>
-              </div>
-            </div>
-          )
+        (matches.length > 0) && (
+          <ul className="flex flex-col gap-4 mt-6">
+            {
+              matches.map((match) => (
+                <MatchItem key={match.matches.id} match={match} />
+              ))
+            }
+          </ul>
+        )
       }
 
       {
-        (!formIsVisible && matches.length > 0) && (
+        (matches.length === 0 && isAuthenticated) && (
+          <div className="flex flex-col items-center justify-center mt-28">
+            <div className="w-full max-w-[300px] flex flex-col items-center gap-5">
+              <div className="w-[80px] h-[80px] flex items-center justify-center rounded-md bg-[#cfa321]">
+                <TbPlayFootball className="text-5xl" />
+              </div>
+
+              <span className="text-[1.25rem] text-center">Nenhuma partida iniciada. Clique no botão abaixo para iniciar uma nova patida.</span>
+
+              <button
+                onClick={() => setFormIsVisible(true)}
+                className="w-full h-10 flex items-center justify-center gap-2 rounded-md transition-all bg-[#cfa321] hover:bg-[#9a7917]"
+              >
+                <span className="font-bold">Iniciar</span>
+              </button>
+            </div>
+          </div>
+        )
+      }
+
+      {
+        (!formIsVisible && matches.length > 0 && isAuthenticated) && (
           <div className="w-full flex items-center justify-center fixed right-0 bottom-4">
             <button
               onClick={() => setFormIsVisible(true)}
