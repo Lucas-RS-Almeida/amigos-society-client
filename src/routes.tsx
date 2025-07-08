@@ -14,7 +14,7 @@ export function CustomRoutes() {
     <Routes>
       <Route path="/" element={<Homepage />} />
       {!isAuthenticated && (
-        <Route path="/authentication" element={<Authentication />} />
+        <Route path="/login" element={<Authentication />} />
       )}
       <Route path="/matches" element={<Match />} />
     </Routes>
