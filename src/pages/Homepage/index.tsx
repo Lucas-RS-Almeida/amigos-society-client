@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
+import type { AxiosResponse } from "axios";
+
+import { api } from "../../api";
 
 import { Slider } from "./components/slider";
 import { PlayerPage } from "./components/playerPage";
 import { GoalkeeperPage } from "./components/goalkeeperPage";
 import { CardWarning } from "./components/cardWarning";
-import type { AxiosResponse } from "axios";
-import { api } from "../../api";
 
 interface ILSProps {
   registred: boolean;
