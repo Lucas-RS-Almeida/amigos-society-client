@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import type { AxiosResponse } from "axios";
 import { toast } from "react-toastify";
 import { IoClose, IoChevronDown } from "react-icons/io5";
+import { IoIosFootball } from "react-icons/io";
 
 import type { IMatchProps } from "./matches";
 
@@ -12,11 +13,12 @@ interface IMIProps {
 }
 
 export interface IMPProps {
-  match_player: {
+  statistics_player: {
     id: string,
     matchId: string,
     playerId: string,
     teamId: string,
+    teamType: "home" | "away",
     goals: number,
     yellowCards: number,
     redCard: boolean,
@@ -53,7 +55,9 @@ export interface IMPProps {
 }
 
 export function MatchItem({ match }: IMIProps) {
-  const [matchPlayer, setMatchPlayer] = useState<IMPProps[]>([]);
+  const [statisticsPlayer, setStatisticPlayer] = useState<IMPProps[]>([]);
+
+  const [statisticsView, setStatisticsView] = useState<boolean>(false);
 
   const colorsTeams = [
     {
@@ -79,18 +83,18 @@ export function MatchItem({ match }: IMIProps) {
   ];
 
   useEffect(() => {
-    async function loadMatchPlayer() {
+    async function statisticsPlayer() {
       try {
         const response: AxiosResponse<IMPProps[]> = await api
-          .get(`/match-player/${match.matches.id}`);
+          .get(`/statistic-player/${match.matches.id}`);
 
-        setMatchPlayer(response.data);
+        setStatisticPlayer(response.data);
       } catch (error: any) {
         toast.error(error?.response?.data?.error);
       }
     }
 
-    loadMatchPlayer();
+    statisticsPlayer();
   }, []);
 
   return (
@@ -116,23 +120,13 @@ export function MatchItem({ match }: IMIProps) {
             <span>{match.home_team.name}</span>
           </div>
 
-          <span className="text-5xl">
-            {
-              matchPlayer.find((mp) => mp.match_player.teamId === match.home_team.id)
-                ?.match_player.goals || 0
-            }
-          </span>
+          <span className="text-5xl">{match.matches.homeScore}</span>
         </div>
 
         <IoClose className="text-4xl" />
 
         <div className="flex items-start gap-12">
-          <span className="text-5xl">
-            {
-              matchPlayer.find((mp) => mp.match_player.teamId === match.away_team.id)
-                ?.match_player.goals || 0
-            }
-          </span>
+          <span className="text-5xl">{match.matches.awayScore}</span>
 
           <div className="flex flex-col items-end">
             <div
@@ -145,11 +139,117 @@ export function MatchItem({ match }: IMIProps) {
         </div>
       </div>
 
-      <div className="w-full flex justify-center mt-4">
-        <button className="flex items-center justify-center gap-2">
-          <span>Mostar mais</span>
+      {
+        statisticsView && (
+          <div className="flex items-start justify-between mt-5">
+            <div className="flex flex-col items-start gap-2">
+              {
+                statisticsPlayer.filter((sp) => sp.statistics_player.teamType === "home")
+                .reverse()
+                .map((sp) =>{
+                  if (sp.statistics_player.goals > 0) {
+                    return (
+                      <div
+                        key={sp.statistics_player.id}
+                        className="flex items-center gap-8"
+                      >
+                        <span>{sp.player.name}</span>
 
-          <IoChevronDown />
+                        <IoIosFootball />
+                      </div>
+                    )
+                  }
+
+                  if (sp.statistics_player.yellowCards > 0) {
+                    return (
+                      <div
+                        key={sp.statistics_player.id}
+                        className="flex items-center gap-8"
+                      >
+                        <span>{sp.player.name}</span>
+
+                        <div className="w-[10px] h-[12px] rounded-[2px] rotate-12 bg-yellow-500" />
+                      </div>
+                    )
+                  }
+
+                  if (sp.statistics_player.redCard) {
+                    return (
+                      <div
+                        key={sp.statistics_player.id}
+                        className="flex items-center gap-8"
+                      >
+                        <span>{sp.player.name}</span>
+
+                        <div className="w-[10px] h-[12px] rounded-[2px] rotate-12 bg-red-500" />
+                      </div>
+                    )
+                  }
+                })
+              }
+            </div>
+            <div className="flex flex-col items-end gap-2">
+              {
+                statisticsPlayer.filter((sp) => sp.statistics_player.teamType === "away")
+                .reverse()
+                .map((sp) =>{
+                  if (sp.statistics_player.goals > 0) {
+                    return (
+                      <div
+                        key={sp.statistics_player.id}
+                        className="flex items-center gap-8"
+                      >
+                        <IoIosFootball />
+
+                        <span>{sp.player.name}</span>
+                      </div>
+                    )
+                  }
+
+                  if (sp.statistics_player.yellowCards > 0) {
+                    return (
+                      <div
+                        key={sp.statistics_player.id}
+                        className="flex items-center gap-8"
+                      >
+                        <div className="w-[10px] h-[12px] rounded-[2px] -rotate-12 bg-yellow-500" />
+
+                        <span>{sp.player.name}</span>
+                      </div>
+                    )
+                  }
+
+                  if (sp.statistics_player.redCard) {
+                    return (
+                      <div
+                        key={sp.statistics_player.id}
+                        className="flex items-center gap-8"
+                      >
+                        <div className="w-[10px] h-[12px] rounded-[2px] -rotate-12 bg-red-500" />
+
+                        <span>{sp.player.name}</span>
+                      </div>
+                    )
+                  }
+                })
+              }
+            </div>
+          </div>
+        )
+      }
+
+      <div className="w-full flex justify-center mt-4">
+        <button
+          onClick={() => setStatisticsView(prevState => !prevState)}
+          className="flex items-center justify-center gap-2"
+        >
+          <span>
+            {
+              statisticsView ? "Mostar menos" : "Mostrar mais"
+            }
+          </span>
+
+          <IoChevronDown className={`mt-1 transition-transform ${statisticsView && `rotate-180`}`} />
         </button>
       </div>
     </li>
