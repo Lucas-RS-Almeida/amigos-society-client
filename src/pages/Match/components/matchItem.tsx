@@ -245,7 +245,7 @@ export function MatchItem({ match }: IMIProps) {
         >
           <span>
             {
-              statisticsView ? "Mostar menos" : "Mostrar mais"
+              statisticsView ? "Ocultar estatísticas" : "Mostrar estatísticas"
             }
           </span>
 
