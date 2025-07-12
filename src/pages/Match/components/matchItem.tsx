@@ -8,6 +8,29 @@ import type { IMatchProps } from "./matches";
 
 import { api } from "../../../api";
 
+export const colorsTeams = [
+    {
+      name: "Amarelo",
+      color: "#9a7917",
+    },
+    {
+      name: "Azul",
+      color: "#0b171f",
+    },
+    {
+      name: "Laranja",
+      color: "#eb8634",
+    },
+    {
+      name: "Verde",
+      color: "#1b6321",
+    },
+    {
+      name: "Preto",
+      color: "#000",
+    },
+  ];
+
 interface IMIProps {
   match: IMatchProps;
 }
@@ -58,29 +81,6 @@ export function MatchItem({ match }: IMIProps) {
   const [statisticsPlayer, setStatisticPlayer] = useState<IMPProps[]>([]);
 
   const [statisticsView, setStatisticsView] = useState<boolean>(false);
-
-  const colorsTeams = [
-    {
-      name: "Amarelo",
-      color: "#9a7917",
-    },
-    {
-      name: "Azul",
-      color: "#0b171f",
-    },
-    {
-      name: "Laranja",
-      color: "#eb8634",
-    },
-    {
-      name: "Verde",
-      color: "#1b6321",
-    },
-    {
-      name: "Preto",
-      color: "#000",
-    },
-  ];
 
   useEffect(() => {
     async function statisticsPlayer() {
