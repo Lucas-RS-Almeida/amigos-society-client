@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect } from "react";
 import type { AxiosResponse } from "axios";
 import { toast } from "react-toastify";
-import { TbPlayFootball } from "react-icons/tb";
+import { TbSoccerField } from "react-icons/tb";
 
 import { Context } from "../../../contexts/AuthContext";
 
@@ -9,6 +9,9 @@ import { api } from "../../../api";
 
 import { MatchesForm } from "./matchesForm";
 import { MatchItem } from "./matchItem";
+
+import { NoContentCard } from "../../../components/noContentCard";
+import { LoaderData } from "../../../components/loaderData";
 
 export interface IMatchProps {
   home_team: {
@@ -41,6 +44,7 @@ export function Matches() {
 
   const [refresh, setRefresh] = useState<boolean>(false);
   const [formIsVisible, setFormIsVisible] = useState<boolean>(false);
+  const [loadingMatches, setLoadingMatches] = useState<boolean>(false);
 
   const { isAuthenticated } = useContext(Context);
 
@@ -75,6 +79,10 @@ export function Matches() {
     }
   }
 
+  if (loadingMatches) {
+    return <LoaderData $nameData="partidas" />
+  }
+
   return (
     <div>
       <MatchesForm
@@ -97,22 +105,12 @@ export function Matches() {
 
       {
         (matches.length === 0 && isAuthenticated) && (
-          <div className="flex flex-col items-center justify-center mt-28">
-            <div className="w-full max-w-[300px] flex flex-col items-center gap-5">
-              <div className="w-[80px] h-[80px] flex items-center justify-center rounded-md bg-[#cfa321]">
-                <TbPlayFootball className="text-5xl" />
-              </div>
-
-              <span className="text-[1.25rem] text-center">Nenhuma partida iniciada. Clique no botão abaixo para iniciar uma nova patida.</span>
-
-              <button
-                onClick={() => setFormIsVisible(true)}
-                className="w-full h-10 flex items-center justify-center gap-2 rounded-md transition-all bg-[#cfa321] hover:bg-[#9a7917]"
-              >
-                <span className="font-bold">Iniciar</span>
-              </button>
-            </div>
-          </div>
+          <NoContentCard
+            $icon={<TbSoccerField className="text-5xl" />}
+            $message="Nenhuma partida iniciada. Clique no botão abaixo para iniciar uma nova patida."
+            $isAction
+            $onFunction={() => setFormIsVisible(true)}
+          />
         )
       }
 
